@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django import VERSION as DJANGO_VERSION
 from django.contrib.sites.models import Site
+from django.core import validators
 from django.utils.html import format_html_join
 
 try:
@@ -172,6 +173,12 @@ class AbstractField(models.Model):
     slug = models.SlugField(_('Slug'), max_length=2000, blank=True,
             default="")
     field_type = models.IntegerField(_("Type"), choices=fields.NAMES)
+    max_length = models.IntegerField(_("Max length"), null=True, blank=True,
+        help_text=_("Limit maximum length below the default of %s.") % (settings.FIELD_MAX_LENGTH,),
+        validators=[
+            validators.MinValueValidator(1),
+            validators.MaxValueValidator(settings.FIELD_MAX_LENGTH),
+            ])
     required = models.BooleanField(_("Required"), default=True)
     visible = models.BooleanField(_("Visible"), default=True)
     choices = models.CharField(_("Choices"), max_length=settings.CHOICES_MAX_LENGTH, blank=True,

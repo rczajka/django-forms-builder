@@ -11,6 +11,9 @@ if not ("django.contrib.sites" in settings.INSTALLED_APPS):
 # The maximum allowed length for field values.
 FIELD_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_FIELD_MAX_LENGTH", 2000)
 
+# Boolean controlling whether field maximum allowed length is editable in the admin.
+EDITABLE_FIELD_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_EDITABLE_FIELD_MAX_LENGTH", False)
+
 # The maximum allowed length for field labels.
 LABEL_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_LABEL_MAX_LENGTH", 200)
 

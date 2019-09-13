@@ -162,7 +162,10 @@ class FormForForm(forms.ModelForm):
                           "help_text": field.help_text}
             arg_names = field_class.__init__.__code__.co_varnames
             if "max_length" in arg_names:
-                field_args["max_length"] = settings.FIELD_MAX_LENGTH
+                max_length = settings.FIELD_MAX_LENGTH
+                if settings.EDITABLE_FIELD_MAX_LENGTH and field.max_length is not None:
+                    max_length = field.max_length
+                field_args["max_length"] = max_length
             if "choices" in arg_names:
                 choices = list(field.get_choices())
                 if field.field_type == fields.SELECT and not (field.required and field.default):

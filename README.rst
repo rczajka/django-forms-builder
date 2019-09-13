@@ -157,6 +157,9 @@ module.
 
 * ``FORMS_BUILDER_FIELD_MAX_LENGTH`` - Maximum allowed length for
   field values. Defaults to ``2000``
+* ``FORMS_BUILDER_EDITABLE_FIELD_MAX_LENGTH`` - Boolean controlling
+  whether field maximum allowed length is editable in the admin.
+  Defaults to ``False``.
 * ``FORMS_BUILDER_LABEL_MAX_LENGTH`` - Maximum allowed length for
   field labels. Defaults to ``20``
 * ``FORMS_BUILDER_EXTRA_FIELDS`` - Sequence of custom fields that

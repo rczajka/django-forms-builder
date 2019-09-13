@@ -22,8 +22,7 @@ from django.utils.translation import ungettext, ugettext_lazy as _
 
 from forms_builder.forms.forms import EntriesForm
 from forms_builder.forms.models import Form, Field, FormEntry, FieldEntry
-from forms_builder.forms.settings import CSV_DELIMITER, UPLOAD_ROOT
-from forms_builder.forms.settings import USE_SITES, EDITABLE_SLUGS
+from forms_builder.forms import settings
 from forms_builder.forms.utils import now, slugify
 
 try:
@@ -34,7 +33,7 @@ except ImportError:
     XLWT_INSTALLED = False
 
 
-fs = FileSystemStorage(location=UPLOAD_ROOT)
+fs = FileSystemStorage(location=settings.UPLOAD_ROOT)
 form_admin_filter_horizontal = ()
 form_admin_fieldsets = [
     (None, {"fields": ("title", ("status", "login_required",),
@@ -43,11 +42,11 @@ form_admin_fieldsets = [
     (_("Email"), {"fields": ("send_email", "email_from", "email_copies",
         "email_subject", "email_message")}),]
 
-if EDITABLE_SLUGS:
+if settings.EDITABLE_SLUGS:
     form_admin_fieldsets.append(
             (_("Slug"), {"fields": ("slug",), "classes": ("collapse",)}))
 
-if USE_SITES:
+if settings.USE_SITES:
     form_admin_fieldsets.append((_("Sites"), {"fields": ("sites",),
         "classes": ("collapse",)}))
     form_admin_filter_horizontal = ("sites",)
@@ -56,6 +55,8 @@ if USE_SITES:
 class FieldAdmin(admin.TabularInline):
     model = Field
     exclude = ('slug', )
+    if not settings.EDITABLE_FIELD_MAX_LENGTH:
+        exclude += ('max_length',)
 
 
 class FormAdmin(admin.ModelAdmin):
@@ -130,11 +131,11 @@ class FormAdmin(admin.ModelAdmin):
                 response["Content-Disposition"] = attachment
                 queue = StringIO()
                 try:
-                    csv = writer(queue, delimiter=CSV_DELIMITER)
+                    csv = writer(queue, delimiter=settings.CSV_DELIMITER)
                     writerow = csv.writerow
                 except TypeError:
                     queue = BytesIO()
-                    delimiter = bytes(CSV_DELIMITER, encoding="utf-8")
+                    delimiter = bytes(settings.CSV_DELIMITER, encoding="utf-8")
                     csv = writer(queue, delimiter=delimiter)
                     writerow = lambda row: csv.writerow([c.encode("utf-8")
                         if hasattr(c, "encode") else c for c in row])
