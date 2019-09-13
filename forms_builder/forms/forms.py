@@ -128,6 +128,12 @@ date_filter_field = forms.ChoiceField(label=" ", required=False,
 class FormForForm(forms.ModelForm):
     field_entry_model = FieldEntry
 
+    if settings.ERROR_CSS_CLASS:
+        error_css_class = settings.ERROR_CSS_CLASS
+
+    if settings.REQUIRED_CSS_CLASS:
+        required_css_class = settings.REQUIRED_CSS_CLASS
+
     class Meta:
         model = FormEntry
         exclude = ("form", "entry_time")

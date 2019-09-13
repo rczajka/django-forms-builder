@@ -67,28 +67,34 @@ Add ``forms_builder.forms`` to ``INSTALLED_APPS`` in your project's
     )
 
 If you haven't already, ensure ``django.core.context_processors.request``
-is in the ``TEMPLATE_CONTEXT_PROCESSORS`` setting in your project's
-``settings`` module:
+and ``django.contrib.auth.context_processors.auth`` are in the
+``context_processors`` option in the ``TEMPLATES`` setting
+in your project's ``settings`` module:
 
 .. code-block:: python
 
-    TEMPLATE_CONTEXT_PROCESSORS = (
-        # other context processors
-        "django.core.context_processors.request",
-        # Django 1.6 also needs:
-        'django.contrib.auth.context_processors.auth',
-    )
+    TEMPLATES = [
+        {
+             ...
+             'OPTIONS': {
+                 'context_processors': [
+                     # other context processors
+                     'django.template.context_processors.request',
+                     'django.contrib.auth.context_processors.auth',
+                 ],
+             },
+        },
+    ]
 
 Then add ``forms_builder.forms.urls`` to your project's ``urls``
 module:
 
 .. code-block:: python
 
-    from django.conf.urls.defaults import patterns, include, url
+    from django.urls import include, url
     import forms_builder.forms.urls # add this import
 
     from django.contrib import admin
-    admin.autodiscover()
 
     urlpatterns = patterns('',
         # other urlpatterns
@@ -96,14 +102,7 @@ module:
         url(r'^forms/', include(forms_builder.forms.urls)),
     )
 
-Finally, sync your database:
-
-.. code-block:: bash
-
-    $ python manage.py syncdb
-
-As of version 0.5, django-forms-builder provides `South`_ migrations.
-If you use south in your project, you'll also need to run migrations:
+Finally, migrate your database:
 
 .. code-block:: bash
 
@@ -162,10 +161,15 @@ module.
   field labels. Defaults to ``20``
 * ``FORMS_BUILDER_EXTRA_FIELDS`` - Sequence of custom fields that
   will be added to the form field types. Defaults to ``()``
+* ``FORMS_BUILDER_EXTRA_WIDGETS`` - Sequence of custom widgets that
+  will add/update form fields widgets. Defaults to ``()``.
 * ``FORMS_BUILDER_UPLOAD_ROOT`` - The absolute path where files will
   be uploaded to. Defaults to ``None``
 * ``FORMS_BUILDER_USE_HTML5`` - Boolean controlling whether HTML5 form
   fields are used. Defaults to ``True``
+* ``FORMS_BUILDER_ERROR_CSS_CLASS`` - The class attribute for error rows.
+* ``FORMS_BUILDER_REQUIRED_CSS_CLASS`` - The class attribute for
+  required rows.
 * ``FORMS_BUILDER_USE_SITES`` - Boolean controlling whether forms are
   associated to Django's Sites framework.
   Defaults to ``"django.contrib.sites" in settings.INSTALLED_APPS``
@@ -177,6 +181,10 @@ module.
   Defaults to the backtick char: `
 * ``FORMS_BUILDER_CSV_DELIMITER`` - Char to use as a field delimiter
   when exporting form responses as CSV. Defaults to a comma: ,
+* ``FORMS_BUILDER_HELPTEXT_MAX_LENGTH`` - The maximum allowed length
+  for field help text. Defaults to ``100``.
+* ``CHOICES_MAX_LENGTH`` - The maximum allowed length for field choices.
+  Defaults to 1000.
 * ``FORMS_BUILDER_EMAIL_FAIL_SILENTLY`` - Bool used for Django's
   ``fail_silently`` argument when sending email.
   Defaults to ``settings.DEBUG``.
@@ -311,7 +319,6 @@ by installing the `xlwt`_ package:
 
 
 .. _`pip`: http://www.pip-installer.org/
-.. _`South`: http://south.aeracode.org/
 .. _`django-email-extras`: https://github.com/stephenmcd/django-email-extras
 .. _`PGP`: http://en.wikipedia.org/wiki/Pretty_Good_Privacy
 .. _`xlwt`: http://www.python-excel.org/

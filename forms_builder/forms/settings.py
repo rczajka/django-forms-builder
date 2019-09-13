@@ -26,6 +26,12 @@ UPLOAD_ROOT = getattr(settings, "FORMS_BUILDER_UPLOAD_ROOT", None)
 # Boolean controlling whether HTML5 form fields are used.
 USE_HTML5 = getattr(settings, "FORMS_BUILDER_USE_HTML5", True)
 
+# The class attribute for error rows.
+ERROR_CSS_CLASS = getattr(settings, "FORMS_BUILDER_ERROR_CSS_CLASS", None)
+
+# The class attribute for required rows.
+REQUIRED_CSS_CLASS = getattr(settings, "FORMS_BUILDER_REQUIRED_CSS_CLASS", None)
+
 # Boolean controlling whether forms are associated to Django's Sites framework.
 USE_SITES = getattr(settings, "FORMS_BUILDER_USE_SITES",
     hasattr(settings, "SITE_ID"))
