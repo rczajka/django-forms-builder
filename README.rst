@@ -161,7 +161,7 @@ module.
   whether field maximum allowed length is editable in the admin.
   Defaults to ``False``.
 * ``FORMS_BUILDER_LABEL_MAX_LENGTH`` - Maximum allowed length for
-  field labels. Defaults to ``20``
+  field labels. Defaults to ``200``
 * ``FORMS_BUILDER_EXTRA_FIELDS`` - Sequence of custom fields that
   will be added to the form field types. Defaults to ``()``
 * ``FORMS_BUILDER_EXTRA_WIDGETS`` - Sequence of custom widgets that
@@ -185,9 +185,9 @@ module.
 * ``FORMS_BUILDER_CSV_DELIMITER`` - Char to use as a field delimiter
   when exporting form responses as CSV. Defaults to a comma: ,
 * ``FORMS_BUILDER_HELPTEXT_MAX_LENGTH`` - The maximum allowed length
-  for field help text. Defaults to ``100``.
+  for field help text. Defaults to ``2000``.
 * ``CHOICES_MAX_LENGTH`` - The maximum allowed length for field choices.
-  Defaults to 1000.
+  Defaults to 2000.
 * ``FORMS_BUILDER_EMAIL_FAIL_SILENTLY`` - Bool used for Django's
   ``fail_silently`` argument when sending email.
   Defaults to ``settings.DEBUG``.

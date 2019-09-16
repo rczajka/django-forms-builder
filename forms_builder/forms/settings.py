@@ -52,10 +52,10 @@ CHOICES_UNQUOTE = getattr(settings, "FORMS_BUILDER_CHOICES_UNQUOTE", "`")
 CSV_DELIMITER = getattr(settings, "FORMS_BUILDER_CSV_DELIMITER", ",")
 
 # The maximum allowed length for field help text
-HELPTEXT_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_HELPTEXT_MAX_LENGTH", 100)
+HELPTEXT_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_HELPTEXT_MAX_LENGTH", 2000)
 
 # The maximum allowed length for field choices
-CHOICES_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_CHOICES_MAX_LENGTH", 1000)
+CHOICES_MAX_LENGTH = getattr(settings, "FORMS_BUILDER_CHOICES_MAX_LENGTH", 2000)
 
 # Does sending emails fail silently or raise an exception.
 EMAIL_FAIL_SILENTLY = getattr(settings, "FORMS_BUILDER_EMAIL_FAIL_SILENTLY",
