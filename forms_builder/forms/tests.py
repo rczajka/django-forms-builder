@@ -273,3 +273,11 @@ class Tests(TestCase):
             <div><a href='/admin/forms/form/1/entries/show/'>View all entries</a></div>
             <div><a href='/admin/forms/form/1/entries/export/'>Export all entries</a></div>
         """)
+
+    def test_sent_view(self):
+        form = Form.objects.create(title="Test", slug='test', status=STATUS_PUBLISHED)
+        if USE_SITES:
+            form.sites.add(self._site)
+            form.save()
+        response = self.client.get('/forms/test/sent/')
+        self.assertEqual(response.status_code, 200)

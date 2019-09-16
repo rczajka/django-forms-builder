@@ -10,10 +10,11 @@ except ImportError:
     # For Django 1.8 compatibility
     from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect
 from django.template import RequestContext
 from django.utils.http import urlquote
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from email_extras.utils import send_mail_template
 
 from forms_builder.forms.forms import FormForForm
@@ -114,10 +115,10 @@ class FormDetail(TemplateView):
 form_detail = FormDetail.as_view()
 
 
-def form_sent(request, slug, template="forms/form_sent.html"):
-    """
-    Show the response message.
-    """
-    published = Form.objects.published(for_user=request.user)
-    context = {"form": get_object_or_404(published, slug=slug)}
-    return render_to_response(template, context, RequestContext(request))
+class FormSent(DetailView):
+    template_name = "forms/form_sent.html"
+
+    def get_queryset(self):
+        return Form.objects.published(for_user=self.request.user)
+
+form_sent = FormSent.as_view()
