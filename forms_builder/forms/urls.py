@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 try:
     from django.urls import re_path
 except ImportError:
-    # For Django 1.8 compatibility
+    # For Django 1.11 compatibility
     from django.conf.urls import url as re_path
 
 from forms_builder.forms import views

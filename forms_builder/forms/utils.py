@@ -3,14 +3,7 @@ from __future__ import unicode_literals
 from django.template.defaultfilters import slugify as django_slugify
 from importlib import import_module
 from unidecode import unidecode
-
-
-# Timezone support with fallback.
-try:
-    from django.utils.timezone import now
-except ImportError:
-    from datetime import datetime
-    now = datetime.now
+from django.utils.timezone import now
 
 
 def slugify(s):

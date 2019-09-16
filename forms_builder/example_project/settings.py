@@ -13,7 +13,6 @@ MEDIA_URL = STATIC_URL + "media/"
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, *MEDIA_URL.strip("/").split("/"))
 ADMIN_MEDIA_PREFIX = STATIC_URL + "admin/"
 ROOT_URLCONF = "%s.urls" % PROJECT_DIRNAME
-TEMPLATE_DIRS = (os.path.join(PROJECT_ROOT, "templates"),)
 SECRET_KEY = "asdfa4wtW#$Gse4aGdfs"
 ADMINS = ()
 
@@ -61,16 +60,6 @@ MIDDLEWARE = (
 # For Django 1.8 compatibility
 MIDDLEWARE_CLASSES = MIDDLEWARE
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.contrib.messages.context_processors.messages",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.static",
-    "django.core.context_processors.media",
-    "django.core.context_processors.request",
-)
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -91,4 +80,3 @@ try:
 except ImportError:
     pass
 
-TEMPLATE_DEBUG = DEBUG

@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, RequestContext, Template
 from django.test import TestCase
 
-from forms_builder.forms.fields import NAMES, FILE, SELECT
+from forms_builder.forms.fields import NAMES, FILE, SELECT, TEXT
 from forms_builder.forms.forms import FormForForm
 from forms_builder.forms.models import (Form, Field,
                                         STATUS_DRAFT, STATUS_PUBLISHED)
@@ -240,6 +240,28 @@ class Tests(TestCase):
                 <option value="two" selected>two</option>
                 <option value="three">three</option>
             </select>""", html=True)
+
+    def test_admin(self):
+        form = Form.objects.create(title="Test")
+        field = form.fields.create(label="Foo", field_type=TEXT)
+        entry = form.entries.create(entry_time='1970-01-01T00:00')
+        entry.fields.create(field_id=field.id, value='test, value')
+        username = password = 'test'
+        user = User.objects.create_superuser(username, "", password)
+        self.client.login(username='test', password='test')
+
+        response = self.client.get('/admin/forms/form/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "'/admin/forms/form/1/entries/'")
+        self.assertContains(response, "'/admin/forms/form/1/entries/show/'")
+        self.assertContains(response, "'/admin/forms/form/1/entries/export/'")
+
+        response = self.client.get('/admin/forms/form/1/entries/show/')
+
+        response = self.client.get('/admin/forms/form/1/entries/export/')
+        self.assertEqual(response.content,
+            b'Foo,Date/time\r\n'
+            b'"test, value",1970-01-01 00:00:00\r\n')
 
     def test_admin_link(self):
         form = Form.objects.create(title="Test")

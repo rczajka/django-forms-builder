@@ -254,11 +254,7 @@ class FormForForm(forms.ModelForm):
                 new = {"entry": entry, "field_id": field.id, "value": value}
                 new_entry_fields.append(self.field_entry_model(**new))
         if new_entry_fields:
-            if django.VERSION >= (1, 4, 0):
-                self.field_entry_model.objects.bulk_create(new_entry_fields)
-            else:
-                for field_entry in new_entry_fields:
-                    field_entry.save()
+            self.field_entry_model.objects.bulk_create(new_entry_fields)
         return entry
 
     def email_to(self):
