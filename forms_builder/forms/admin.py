@@ -174,7 +174,7 @@ class FormAdmin(admin.ModelAdmin):
                         zipfile.write(
                             join(fs.location, entry.value),
                             '%d/%d/%s' % (
-                                entries_form.form.id,
+                                entry.entry_id,
                                 entry.field_id,
                                 entry.value.rsplit('/', 1)[-1]
                             ),
