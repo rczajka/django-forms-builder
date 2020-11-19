@@ -371,7 +371,7 @@ class EntriesForm(forms.Form):
             fields.append(self.entry_time_name)
         return fields
 
-    def rows(self, csv=False):
+    def rows(self, csv=False, with_attachments=False):
         """
         Returns each row based on the selected criteria.
         """
@@ -456,11 +456,18 @@ class EntriesForm(forms.Form):
                     valid_row = False
             # Create download URL for file fields.
             if field_entry.value and field_id in file_field_ids:
-                url = reverse("admin:form_file", args=(field_entry.id,))
-                field_value = self.request.build_absolute_uri(url)
-                if not csv:
-                    parts = (field_value, split(field_entry.value)[1])
-                    field_value = mark_safe("<a href=\"%s\">%s</a>" % parts)
+                if with_attachments:
+                    field_value = '%d/%d/%s' % (
+                            current_entry,
+                            field_id,
+                            field_entry.value.rsplit('/', 1)[-1]
+                            )
+                else:
+                    url = reverse("admin:form_file", args=(field_entry.id,))
+                    field_value = self.request.build_absolute_uri(url)
+                    if not csv:
+                        parts = (field_value, split(field_entry.value)[1])
+                        field_value = mark_safe("<a href=\"%s\">%s</a>" % parts)
             # Only use values for fields that were selected.
             try:
                 current_row[field_indexes[field_id]] = field_value

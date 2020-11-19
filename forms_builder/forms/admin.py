@@ -6,6 +6,7 @@ from mimetypes import guess_type
 from os.path import join
 from datetime import datetime
 from io import BytesIO, StringIO
+from zipfile import ZipFile
 
 from django.contrib import admin
 from django.core.files.storage import FileSystemStorage
@@ -20,10 +21,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ungettext, ugettext_lazy as _
 
+from forms_builder.forms import fields
 from forms_builder.forms.forms import EntriesForm
 from forms_builder.forms.models import Form, Field, FormEntry, FieldEntry
 from forms_builder.forms import settings
 from forms_builder.forms.utils import now, slugify
+
 
 try:
     import xlwt
@@ -98,6 +101,9 @@ class FormAdmin(admin.ModelAdmin):
             re_path("^(?P<form_id>\d+)/entries/export/$",
                 self.admin_site.admin_view(self.entries_view),
                 {"export": True}, name="form_entries_export"),
+            re_path("^(?P<form_id>\d+)/entries/export.zip$",
+                self.admin_site.admin_view(self.entries_view),
+                {"export_zip": True}, name="form_entries_export_zip"),
             re_path("^file/(?P<field_entry_id>\d+)/$",
                 self.admin_site.admin_view(self.file_view),
                 name="form_file"),
@@ -105,7 +111,7 @@ class FormAdmin(admin.ModelAdmin):
         return extra_urls + urls
 
     def entries_view(self, request, form_id, show=False, export=False,
-                     export_xls=False):
+                     export_xls=False, export_zip=False):
         """
         Displays the form entries in a HTML table with option to
         export as CSV file.
@@ -120,13 +126,14 @@ class FormAdmin(admin.ModelAdmin):
         entries_form = EntriesForm(*args)
         delete = "%s.delete_formentry" % self.formentry_model._meta.app_label
         can_delete_entries = request.user.has_perm(delete)
-        submitted = entries_form.is_valid() or show or export or export_xls
+        submitted = entries_form.is_valid() or show or export or export_xls or export_zip
         export = export or request.POST.get("export")
         export_xls = export_xls or request.POST.get("export_xls")
+        export_zip = export_zip or request.POST.get("export_zip")
         if submitted:
-            if export:
-                response = HttpResponse(content_type="text/csv")
-                fname = "%s-%s.csv" % (form.slug, slugify(now().ctime()))
+            if export or export_zip:
+                response = HttpResponse(content_type="application/zip" if export_zip else "text/csv")
+                fname = "%s-%s.%s" % (form.slug, slugify(now().ctime()), "zip" if export_zip else "csv")
                 attachment = "attachment; filename=%s" % fname
                 response["Content-Disposition"] = attachment
                 queue = StringIO()
@@ -140,10 +147,42 @@ class FormAdmin(admin.ModelAdmin):
                     writerow = lambda row: csv.writerow([c.encode("utf-8")
                         if hasattr(c, "encode") else c for c in row])
                 writerow(entries_form.columns())
-                for row in entries_form.rows(csv=True):
+                for row in entries_form.rows(csv=True, with_attachments=export_zip):
                     writerow(row)
                 data = queue.getvalue()
-                response.write(data)
+
+                if export_zip:
+                    output = BytesIO()
+                    zipfile = ZipFile(output, 'w')
+                    zipfile.writestr(
+                        'entries.csv',
+                        data
+                    )
+    
+                    file_fields_ids = [
+                        field.id
+                        for field in entries_form.form_fields
+                        if (entries_form.posted_data("field_%s_export" % field.id) and
+                            field.is_a(fields.FILE))
+                    ]
+
+                    field_entries = entries_form.fieldentry_model.objects.filter(
+                        entry__form=entries_form.form,
+                        field_id__in=file_fields_ids
+                    )
+                    for entry in field_entries:
+                        zipfile.write(
+                            join(fs.location, entry.value),
+                            '%d/%d/%s' % (
+                                entries_form.form.id,
+                                entry.field_id,
+                                entry.value.rsplit('/', 1)[-1]
+                            ),
+                        )
+                    zipfile.close()
+                    response.write(output.getvalue())
+                else:
+                    response.write(data)
                 return response
             elif XLWT_INSTALLED and export_xls:
                 response = HttpResponse(content_type="application/vnd.ms-excel")
